@@ -29,6 +29,8 @@ func (a *App) newServeMux() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", a.mainHandler)
 	mux.HandleFunc("/get_balance", a.getBalanceHandler)
+	mux.HandleFunc("/add_to_balance", a.addBalanceHandler)
+	mux.HandleFunc("/transfer_balance", a.transferBalanceHandler)
 	a.mux = mux
 }
 

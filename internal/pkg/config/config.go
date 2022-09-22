@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v2"
 )
@@ -10,8 +11,9 @@ import (
 const cfgFilename = "cfg.yml"
 
 type Config struct {
-	Host string `yaml:"host"`
-	Port string `yaml:"port"`
+	Host            string        `yaml:"host"`
+	Port            string        `yaml:"port"`
+	TimeoutConnPsql time.Duration `yaml:"timeout_conn_psql"`
 }
 
 var cfg Config
@@ -34,4 +36,8 @@ func GetConfig() Config {
 
 func (c Config) GetHostPort() string {
 	return c.Host + ":" + c.Port
+}
+
+func (c Config) GetConnectionTimeout() time.Duration {
+	return c.TimeoutConnPsql
 }

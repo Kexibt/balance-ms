@@ -11,7 +11,7 @@ func TestGet(t *testing.T) {
 		t.Errorf("Expected 0, but got %v", res)
 	}
 
-	expected := uint(200)
+	expected := float64(200)
 	b.data[id] = expected
 
 	res = b.GetByUID(id)
@@ -44,9 +44,9 @@ func TestNegativeChange(t *testing.T) {
 func TestPositiveChange(t *testing.T) {
 	b := NewBalances()
 	id := "user1_test"
-	expected := uint(100)
+	expected := float64(100)
 
-	res, err := b.Change(id, int(expected))
+	res, err := b.Change(id, expected)
 	if err != nil {
 		t.Errorf("Expected ok status, but got an error: %v", err)
 	}
@@ -58,15 +58,15 @@ func TestPositiveChange(t *testing.T) {
 func TestPositiveNegativeChange(t *testing.T) {
 	b := NewBalances()
 	id := "user1_test"
-	add := 100
-	sub := -50
-	expected := uint(50)
+	add := float64(100)
+	sub := float64(-50)
+	expected := float64(50)
 
 	res, err := b.Change(id, add)
 	if err != nil {
 		t.Errorf("Expected ok status, but got an error: %v", err)
 	}
-	if res != uint(add) {
+	if res != add {
 		t.Errorf("Expected: %v, but got: %v", add, res)
 	}
 
@@ -83,21 +83,21 @@ func TestPositiveTransfer(t *testing.T) {
 	b := NewBalances()
 	id1 := "user1_test"
 	id2 := "user2_test"
-	balance1 := 1000
-	balance2 := 1500
-	transfer := 1000
-	expected1 := 0
-	expected2 := 2500
+	balance1 := float64(1000)
+	balance2 := float64(1500)
+	transfer := float64(1000)
+	expected1 := float64(0)
+	expected2 := float64(2500)
 
-	b.data[id1] = uint(balance1)
-	b.data[id2] = uint(balance2)
+	b.data[id1] = balance1
+	b.data[id2] = balance2
 
 	res1, res2, err := b.Transfer(id1, id2, transfer)
 	if err != nil {
 		t.Errorf("Expected ok status, but got an error: %s", err)
 	}
-	if res1 != uint(expected1) || res2 != uint(expected2) {
-		t.Errorf("Expected:\nres1: %d, res2: %d, but got:\nres1: %d, res2: %d", expected1, expected2, res1, res2)
+	if res1 != expected1 || res2 != expected2 {
+		t.Errorf("Expected:\nres1: %v, res2: %v, but got:\nres1: %v, res2: %v", expected1, expected2, res1, res2)
 	}
 }
 
@@ -105,20 +105,20 @@ func TestNegativeTransfer(t *testing.T) {
 	b := NewBalances()
 	id1 := "user1_test"
 	id2 := "user2_test"
-	balance1 := 900
-	balance2 := 1500
-	transfer := 1000
-	expected1 := 900
-	expected2 := 1500
+	balance1 := float64(900)
+	balance2 := float64(1500)
+	transfer := float64(1000)
+	expected1 := float64(900)
+	expected2 := float64(1500)
 
-	b.data[id1] = uint(balance1)
-	b.data[id2] = uint(balance2)
+	b.data[id1] = balance1
+	b.data[id2] = balance2
 
 	_, _, err := b.Transfer(id1, id2, transfer)
 	if err == nil {
 		t.Error("Expected err, but got nil")
 	}
-	if b.data[id1] != uint(balance1) || b.data[id2] != uint(balance2) {
-		t.Errorf("Expected:\nres1: %d, res2: %d, but got:\nres1: %v, res2: %v", expected1, expected2, b.data[id1], b.data[id2])
+	if b.data[id1] != balance1 || b.data[id2] != balance2 {
+		t.Errorf("Expected:\nres1: %v, res2: %v, but got:\nres1: %v, res2: %v", expected1, expected2, b.data[id1], b.data[id2])
 	}
 }

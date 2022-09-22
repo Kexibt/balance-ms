@@ -5,13 +5,13 @@ type Database interface {
 
 type History interface {
 	GetByUID(userID string) []string
-	Add(userID string, amount int)
+	Add(userID string, oldBalance, newBalance, amount float64)
 }
 
 type Balances interface {
-	GetByUID(userID string) uint
-	Change(userID string, amount int) (uint, error)
-	Transfer(fromUserID, toUserID string, amount int) (uint, uint, error)
+	GetByUID(userID string) float64
+	Change(userID string, amount float64) (float64, error)
+	Transfer(fromUserID, toUserID string, amount float64) (float64, float64, error)
 }
 
 type Config interface {
