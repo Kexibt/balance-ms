@@ -1,3 +1,4 @@
 host: localhost
 port: 8000
 timeout_conn_psql: 5s
+connection_psql: postgres://postgres:postgrespw@localhost:55000

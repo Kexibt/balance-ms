@@ -14,6 +14,7 @@ type Config struct {
 	Host            string        `yaml:"host"`
 	Port            string        `yaml:"port"`
 	TimeoutConnPsql time.Duration `yaml:"timeout_conn_psql"`
+	StringConnPsql  string        `yaml:"connection_psql"`
 }
 
 var cfg Config
@@ -40,4 +41,8 @@ func (c Config) GetHostPort() string {
 
 func (c Config) GetConnectionTimeout() time.Duration {
 	return c.TimeoutConnPsql
+}
+
+func (c Config) GetConnectionString() string {
+	return c.StringConnPsql
 }
