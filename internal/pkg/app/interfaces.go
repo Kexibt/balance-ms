@@ -1,6 +1,9 @@
 package app
 
 type Database interface {
+	Close() error
+	Add(map[string]interface{})
+	ListenAndServe()
 }
 
 type History interface {
@@ -16,4 +19,10 @@ type Balances interface {
 
 type Config interface {
 	GetHostPort() string
+	GetExchangeRateLink() string
+}
+
+type Exchanger interface {
+	Exchange(amount float64, currency string) (float64, error)
+	StartUpdater()
 }

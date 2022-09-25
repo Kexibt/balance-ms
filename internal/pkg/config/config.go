@@ -13,6 +13,7 @@ const cfgFilename = "cfg.yml"
 type Config struct {
 	Host            string        `yaml:"host"`
 	Port            string        `yaml:"port"`
+	ExchangeRate    string        `yaml:"exchange_rate"`
 	TimeoutConnPsql time.Duration `yaml:"timeout_conn_psql"`
 	StringConnPsql  string        `yaml:"connection_psql"`
 }
@@ -20,6 +21,10 @@ type Config struct {
 var cfg Config
 
 func init() {
+	update()
+}
+
+func update() {
 	b, err := os.ReadFile(cfgFilename)
 	if err != nil {
 		log.Fatal(err)
@@ -45,4 +50,8 @@ func (c Config) GetConnectionTimeout() time.Duration {
 
 func (c Config) GetConnectionString() string {
 	return c.StringConnPsql
+}
+
+func (c Config) GetExchangeRateLink() string {
+	return c.ExchangeRate
 }

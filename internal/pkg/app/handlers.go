@@ -28,9 +28,23 @@ func (a *App) getBalanceHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		res := make(map[string]float64, len(value["id"]))
+		res := make(map[string]interface{}, len(value["id"]))
+		ind := 0 // индекс для прохода по курсам валют
 		for _, id := range value["id"] {
-			res[id] = a.balances.GetByUID(id)
+			balance := a.balances.GetByUID(id)
+			if ind < len(value["currency"]) {
+				val, err := a.exchanger.Exchange(balance, value["currency"][ind])
+				ind++
+
+				if err != nil {
+					res[fmt.Sprintf("exchange error [%s]", id)] = err.Error()
+					res[id] = balance
+				} else {
+					res[id] = val
+				}
+			} else {
+				res[id] = balance
+			}
 		}
 
 		w.Header().Add("Content-Type", "application/json")
@@ -67,6 +81,7 @@ func (a *App) addBalanceHandler(w http.ResponseWriter, r *http.Request) {
 					results = append(results, map[string]interface{}{
 						fmt.Sprintf("result ->%s", request["id"]): map[string]interface{}{"balance": res},
 					})
+					a.db.Add(map[string]interface{}{"userID": request["id"], "balance": res})
 				}
 			}
 
@@ -93,6 +108,7 @@ func (a *App) addBalanceHandler(w http.ResponseWriter, r *http.Request) {
 			result = map[string]interface{}{
 				fmt.Sprintf("result ->%s", request["id"]): map[string]interface{}{"balance": res},
 			}
+			a.db.Add(map[string]interface{}{"userID": request["id"], "balance": res})
 		}
 
 		ans, _ := json.Marshal(result)
@@ -132,11 +148,16 @@ func (a *App) transferBalanceHandler(w http.ResponseWriter, r *http.Request) {
 		err = json.Unmarshal(body, &requests)
 
 		if err == nil {
-			results := []map[string]string{}
+			results := []map[string]interface{}{}
 			for _, request := range requests {
-				a.transferForOneOperation(request)
-				// todo
-				results = append(results, map[string]string{fmt.Sprintf("result %s->%s", request["from"], request["to"]): "todo"})
+				resF, resT, err := a.transferForOneOperation(request)
+				if err != nil {
+					results = append(results, map[string]interface{}{fmt.Sprintf("error %s->%s", request["from"], request["to"]): err.Error()})
+				} else {
+					results = append(results, map[string]interface{}{fmt.Sprintf("result %s->%s", request["from"], request["to"]): map[string]interface{}{fmt.Sprintf("balance %s", request["from"]): resF, fmt.Sprintf("balance %s", request["to"]): resT}})
+					a.db.Add(map[string]interface{}{"userID": request["from"], "balance": resF})
+					a.db.Add(map[string]interface{}{"userID": request["to"], "balance": resT})
+				}
 			}
 			ans, _ := json.Marshal(results)
 			w.Header().Add("Content-Type", "application/json")
@@ -145,15 +166,48 @@ func (a *App) transferBalanceHandler(w http.ResponseWriter, r *http.Request) {
 			request := make(map[string]interface{})
 			err = json.Unmarshal(body, &request)
 			if err != nil {
-				// todo error
+				ans, _ := json.Marshal(map[string]string{"error": "неверный json формат"})
+				w.Header().Add("Content-Type", "application/json")
+				w.Write(ans)
+				return
 			}
-			ans, _ := json.Marshal(map[string]string{fmt.Sprintf("result %s->%s", request["from"], request["to"]): "todo"})
+
+			results := []map[string]interface{}{}
+			resF, resT, err := a.transferForOneOperation(request)
+			if err != nil {
+				results = append(results, map[string]interface{}{fmt.Sprintf("error %s->%s", request["from"], request["to"]): err.Error()})
+			} else {
+				results = append(results, map[string]interface{}{fmt.Sprintf("result %s->%s", request["from"], request["to"]): map[string]interface{}{fmt.Sprintf("balance %s", request["from"]): resF, fmt.Sprintf("balance %s", request["to"]): resT}})
+				a.db.Add(map[string]interface{}{"userID": request["from"], "balance": resF})
+				a.db.Add(map[string]interface{}{"userID": request["to"], "balance": resT})
+			}
+
+			ans, _ := json.Marshal(results)
 			w.Header().Add("Content-Type", "application/json")
 			w.Write(ans)
 		}
 	}
 }
 
-func (a *App) transferForOneOperation(request map[string]interface{}) {
+func (a *App) transferForOneOperation(request map[string]interface{}) (float64, float64, error) {
+	from, exists := request["from"]
+	if !exists {
+		return 0, 0, errorMissingID
+	}
 
+	to, exists := request["to"]
+	if !exists {
+		return 0, 0, errorMissingID
+	}
+
+	amount, exists := request["amount"]
+	if !exists {
+		return 0, 0, errorMissingAmount
+	}
+	if amount.(float64) < 0 {
+		return 0, 0, errorNegativeAmount
+	}
+
+	resF, resT, err := a.balances.Transfer(from.(string), to.(string), amount.(float64))
+	return resF, resT, err
 }
