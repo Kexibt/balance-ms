@@ -8,11 +8,13 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
+// Database отвечает за взаимодействие с бд
 type Database struct {
 	conn *pgxpool.Pool
 	oni  chan map[string]interface{}
 }
 
+// NewDatabase конструктор Database
 func NewDatabase(cfg Config) *Database {
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.GetConnectionTimeout())
 	defer cancel()
@@ -42,12 +44,14 @@ func connect(ctx context.Context, connectionStr string) (conn *pgxpool.Pool, err
 	}
 }
 
+// Close закрывает пул подключений
 func (d *Database) Close() error {
 	close(d.oni)
 	d.conn.Close()
 	return nil
 }
 
+// ListenAndServe слушает и прислуживается
 func (d *Database) ListenAndServe() {
 	for updates := range d.oni {
 		go insert(d.conn, updates, d.oni) // можно будет сделать батчами, если обработок много,
@@ -107,6 +111,7 @@ func insert(conn *pgxpool.Pool, updates map[string]interface{}, oni chan map[str
 	}
 }
 
+// Add добавляет запрос на update в очередь запросов
 func (d *Database) Add(update map[string]interface{}) {
 	d.oni <- update
 }

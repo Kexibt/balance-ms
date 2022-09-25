@@ -15,20 +15,24 @@ var (
 	errorWrongCurrency = errors.New("неверный формат валюты")
 )
 
+// DailyRates отвечает перевод денег по курсу
 type DailyRates struct {
 	Date  map[string]float64 `json:"rates"`
 	cfg   Config
 	mutex sync.RWMutex
 }
 
+// Config интерфейс для конфига
 type Config interface {
 	GetExchangeRateLink() string
 }
 
+// NewDailyRates конструктор для DailyRates
 func NewDailyRates(cfg Config) *DailyRates {
 	return &DailyRates{cfg: cfg}
 }
 
+// Exchange обменивает по актуальному курсу
 func (d *DailyRates) Exchange(amount float64, currency string) (float64, error) {
 	d.mutex.RLock()
 	defer d.mutex.RUnlock()
@@ -41,6 +45,7 @@ func (d *DailyRates) Exchange(amount float64, currency string) (float64, error) 
 	return amount * val, nil
 }
 
+// StartUpdater запускает цикл обновлений курса валют
 func (d *DailyRates) StartUpdater() {
 	d.mutex.Lock()
 	err := d.update()
@@ -49,7 +54,7 @@ func (d *DailyRates) StartUpdater() {
 	}
 	d.mutex.Unlock()
 
-	ticker := time.NewTicker(time.Hour * 12)
+	ticker := time.NewTicker(time.Hour * 12) // можно было вынести в конфиг время обновления
 	for range ticker.C {
 		d.mutex.Lock()
 		err := d.update()

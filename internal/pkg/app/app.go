@@ -7,6 +7,7 @@ import (
 	"os/signal"
 )
 
+// App это один большой класс(фасад), выполняющий всю работу
 type App struct {
 	db        Database
 	history   History
@@ -17,6 +18,7 @@ type App struct {
 	mux *http.ServeMux
 }
 
+// NewApp это конструктор для класса App
 func NewApp(db Database, history History, balances Balances, exchanger Exchanger, config Config) *App {
 	a := &App{
 		db:        db,
@@ -38,6 +40,7 @@ func (a *App) newServeMux() {
 	a.mux = mux
 }
 
+// ListenAndServe отвечает за запуск всех необходимых компонентов
 func (a *App) ListenAndServe() error {
 	log.Print("Starting interrupt listener")
 	go a.interrupt()

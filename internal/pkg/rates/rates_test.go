@@ -7,11 +7,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// mockCfg заглушка для конфига, чтобы не использовать актуальный
 type mockCfg struct {
 	ExchangeRate string `yaml:"exchange_rate"`
 }
 
-func NewMockCfg() (mockCfg, error) {
+// конструктор
+func newMockCfg() (mockCfg, error) {
 	cfg := mockCfg{}
 	path, err := os.Getwd()
 	if err != nil {
@@ -35,7 +37,7 @@ func (c mockCfg) GetExchangeRateLink() string {
 }
 
 func TestUpdate(t *testing.T) {
-	cfg, err := NewMockCfg()
+	cfg, err := newMockCfg()
 	if err != nil {
 		t.Error(err)
 	}
@@ -51,7 +53,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestConvert(t *testing.T) {
-	cfg, err := NewMockCfg()
+	cfg, err := newMockCfg()
 	if err != nil {
 		t.Error(err)
 	}
@@ -75,7 +77,7 @@ func TestConvert(t *testing.T) {
 }
 
 func TestConvertNegative(t *testing.T) {
-	cfg, err := NewMockCfg()
+	cfg, err := newMockCfg()
 	if err != nil {
 		t.Error(err)
 	}

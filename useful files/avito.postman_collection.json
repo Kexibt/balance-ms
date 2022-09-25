@@ -1,0 +1,162 @@
+{
+	"info": {
+		"_postman_id": "cb7e6bd2-40d3-4960-b2ab-df08f8712298",
+		"name": "avito",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13647938"
+	},
+	"item": [
+		{
+			"name": "Get balance",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/get_balance?id=user1_test&currency=RUB&id=user2_test&id=user3_test&currency=EUR",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"get_balance"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "user1_test"
+						},
+						{
+							"key": "currency",
+							"value": "RUB"
+						},
+						{
+							"key": "id",
+							"value": "user2_test"
+						},
+						{
+							"key": "id",
+							"value": "user3_test"
+						},
+						{
+							"key": "currency",
+							"value": "EUR"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transfer balance",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[{\n    \"from\":\"user2_test\",\n    \"to\":\"user1_test\",\n    \"amount\":4000\n},{\n    \"from\":\"user1_test\",\n    \"to\":\"user2_test\",\n    \"amount\":3000\n},{\n    \"from\":\"user1_test\",\n    \"to\":\"user2_test\",\n    \"amount\":1500\n},{\n    \"from\":\"user1_test\",\n    \"to\":\"user2_test\",\n    \"amount\":1000\n}\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/transfer_balance",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"transfer_balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Changing balance",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"id\":\"user2_test\",\n        \"amount\":2500\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/add_to_balance",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"add_to_balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Changing balance[s]",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    {\n        \"id\":\"user2_test\",\n        \"amount\":2500\n    },\n    {\n        \"id\":\"user1_test\",\n        \"amount\":1500\n    }\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/add_to_balance",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"add_to_balance"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "0.0.0.0"
+		},
+		{
+			"key": "port",
+			"value": "8000",
+			"type": "string"
+		}
+	]
+}

@@ -10,6 +10,7 @@ import (
 
 const cfgFilename = "cfg.yml"
 
+// Config отвечает за конфигурацию
 type Config struct {
 	Host            string        `yaml:"host"`
 	Port            string        `yaml:"port"`
@@ -36,22 +37,27 @@ func update() {
 	}
 }
 
+// GetConfig возвращает копию конфига
 func GetConfig() Config {
 	return cfg
 }
 
+// GetHostPort возвращает полный адрес
 func (c Config) GetHostPort() string {
 	return c.Host + ":" + c.Port
 }
 
+// GetConnectionTimeout возвращает продолжительность ожидания подключения к бд
 func (c Config) GetConnectionTimeout() time.Duration {
 	return c.TimeoutConnPsql
 }
 
+// GetConnectionString возвращает строку подключения к бд
 func (c Config) GetConnectionString() string {
 	return c.StringConnPsql
 }
 
+// GetExchangeRateLink возвращает ссылку на сервис для получения актуального курса валют
 func (c Config) GetExchangeRateLink() string {
 	return c.ExchangeRate
 }

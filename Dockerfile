@@ -1,6 +1,12 @@
-FROM golang:latest
+FROM golang:latest as base
+FROM base as dev
+
 RUN mkdir /app
 COPY . /app
 WORKDIR /app
-RUN go build -o service main.go 
-CMD [ "/app/service" ]
+RUN go mod download
+
+EXPOSE 8000
+
+RUN go build -o microservice .
+CMD [ "./microservice" ]
