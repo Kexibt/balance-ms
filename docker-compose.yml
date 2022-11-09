@@ -3,7 +3,7 @@ volumes:
 
 services:
   postgres:
-    image: micropostgres:latest
+    image: psql_ms:latest
     environment:
       - POSTGRES_PASSWORD=postgrespw
     ports:
@@ -12,6 +12,6 @@ services:
     #   - .:/database/docker-entrypoint-initdb.d
     #   # - data:/var/lib/postgresql
   microservice:
-    image: microservice:latest
+    image: app_ms:latest
     ports:
       - 8000:8000

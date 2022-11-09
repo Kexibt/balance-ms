@@ -19,15 +19,15 @@ func (a *App) mainHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) getBalanceHandler(w http.ResponseWriter, r *http.Request) {
 	status := false
+	w.Header().Add("Content-Type", "application/json")
 
 	switch r.Method {
 	case "GET":
 		value := r.URL.Query()
 		if len(value["id"]) < 1 {
 			ans, _ := json.Marshal(map[string]string{"error": "задайте id через параметры запроса"})
-			w.Header().Add("Content-Type", "application/json")
-			w.Write(ans)
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(ans)
 			return
 		}
 
@@ -55,16 +55,14 @@ func (a *App) getBalanceHandler(w http.ResponseWriter, r *http.Request) {
 		if !status {
 			w.WriteHeader(http.StatusOK)
 		}
-		w.Header().Add("Content-Type", "application/json")
 		ans, _ := json.Marshal(res)
 		w.Write(ans)
-	case "POST":
-		// todo
 	}
 }
 
 func (a *App) addBalanceHandler(w http.ResponseWriter, r *http.Request) {
 	status := false
+	w.Header().Add("Content-Type", "application/json")
 
 	switch r.Method {
 	case "GET":
@@ -93,7 +91,6 @@ func (a *App) addBalanceHandler(w http.ResponseWriter, r *http.Request) {
 					results = append(results, map[string]interface{}{
 						fmt.Sprintf("result ->%s", request["id"]): map[string]interface{}{"balance": res},
 					})
-					a.db.Add(map[string]interface{}{"userID": request["id"], "balance": res})
 				}
 			}
 
@@ -101,7 +98,6 @@ func (a *App) addBalanceHandler(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 			}
 			ans, _ := json.Marshal(results)
-			w.Header().Add("Content-Type", "application/json")
 			w.Write(ans)
 			return
 		}
@@ -110,11 +106,9 @@ func (a *App) addBalanceHandler(w http.ResponseWriter, r *http.Request) {
 		err = json.Unmarshal(body, &request)
 		if err != nil {
 			ans, _ := json.Marshal(map[string]string{"error": "неверный json формат"})
-
 			w.WriteHeader(http.StatusBadRequest)
 			status = true
 
-			w.Header().Add("Content-Type", "application/json")
 			w.Write(ans)
 			return
 		}
@@ -129,13 +123,12 @@ func (a *App) addBalanceHandler(w http.ResponseWriter, r *http.Request) {
 			result = map[string]interface{}{
 				fmt.Sprintf("result ->%s", request["id"]): map[string]interface{}{"balance": res},
 			}
-			a.db.Add(map[string]interface{}{"userID": request["id"], "balance": res})
 		}
+
 		if !status {
 			w.WriteHeader(http.StatusOK)
 		}
 		ans, _ := json.Marshal(result)
-		w.Header().Add("Content-Type", "application/json")
 		w.Write(ans)
 	}
 }
@@ -157,6 +150,7 @@ func (a *App) addForOneOperation(request map[string]interface{}) (float64, error
 
 func (a *App) transferBalanceHandler(w http.ResponseWriter, r *http.Request) {
 	status := false
+	w.Header().Add("Content-Type", "application/json")
 
 	switch r.Method {
 	case "GET":
@@ -182,8 +176,6 @@ func (a *App) transferBalanceHandler(w http.ResponseWriter, r *http.Request) {
 					status = true
 				} else {
 					results = append(results, map[string]interface{}{fmt.Sprintf("result %s->%s", request["from"], request["to"]): map[string]interface{}{fmt.Sprintf("balance %s", request["from"]): resF, fmt.Sprintf("balance %s", request["to"]): resT}})
-					a.db.Add(map[string]interface{}{"userID": request["from"], "balance": resF})
-					a.db.Add(map[string]interface{}{"userID": request["to"], "balance": resT})
 				}
 			}
 
@@ -191,14 +183,12 @@ func (a *App) transferBalanceHandler(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 			}
 			ans, _ := json.Marshal(results)
-			w.Header().Add("Content-Type", "application/json")
 			w.Write(ans)
 		} else {
 			request := make(map[string]interface{})
 			err = json.Unmarshal(body, &request)
 			if err != nil {
 				ans, _ := json.Marshal(map[string]string{"error": "неверный json формат"})
-				w.Header().Add("Content-Type", "application/json")
 				w.Write(ans)
 				return
 			}
@@ -211,15 +201,12 @@ func (a *App) transferBalanceHandler(w http.ResponseWriter, r *http.Request) {
 				status = true
 			} else {
 				results = append(results, map[string]interface{}{fmt.Sprintf("result %s->%s", request["from"], request["to"]): map[string]interface{}{fmt.Sprintf("balance %s", request["from"]): resF, fmt.Sprintf("balance %s", request["to"]): resT}})
-				a.db.Add(map[string]interface{}{"userID": request["from"], "balance": resF})
-				a.db.Add(map[string]interface{}{"userID": request["to"], "balance": resT})
 			}
 
 			if !status {
 				w.WriteHeader(http.StatusOK)
 			}
 			ans, _ := json.Marshal(results)
-			w.Header().Add("Content-Type", "application/json")
 			w.Write(ans)
 		}
 	}

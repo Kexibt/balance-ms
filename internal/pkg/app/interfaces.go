@@ -1,12 +1,5 @@
 package app
 
-// Database интерфейс отображающий функционал класса, отвечающий за взаимодействие с бд
-type Database interface {
-	Close() error
-	Add(map[string]interface{})
-	ListenAndServe()
-}
-
 // History интерфейс отоброжающий нереализованный функционал класса History
 type History interface {
 	GetByUID(userID string) []string

@@ -9,7 +9,6 @@ import (
 
 // App это один большой класс(фасад), выполняющий всю работу
 type App struct {
-	db        Database
 	history   History
 	balances  Balances
 	config    Config
@@ -19,9 +18,8 @@ type App struct {
 }
 
 // NewApp это конструктор для класса App
-func NewApp(db Database, history History, balances Balances, exchanger Exchanger, config Config) *App {
+func NewApp(history History, balances Balances, exchanger Exchanger, config Config) *App {
 	a := &App{
-		db:        db,
 		history:   history,
 		balances:  balances,
 		config:    config,
@@ -45,9 +43,6 @@ func (a *App) ListenAndServe() error {
 	log.Print("Starting interrupt listener")
 	go a.interrupt()
 
-	log.Print("Opening connection to PostgreSQL")
-	go a.db.ListenAndServe()
-
 	log.Print("Starting exchange updater")
 	go a.exchanger.StartUpdater()
 
@@ -62,13 +57,5 @@ func (a *App) interrupt() {
 
 	for range sig {
 		log.Println("Got interrupt signal")
-		err := a.db.Close()
-
-		if err == nil {
-			log.Println("Database connection closed.")
-			os.Exit(0)
-		} else {
-			log.Println(err)
-		}
 	}
 }
